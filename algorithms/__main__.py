@@ -104,9 +104,9 @@ def compute_mincostflow(G, relsim, subs, preds, objs, flowfile):
 			ff.write(json.dumps(mcflow.stream) + '\n')
 			tend = time()
 			times.append(tend - ts)
-			log.info('mincostflow: {:.5f}, #paths: {}, time: {:.2f}s.'.format(
+			print 'mincostflow: {:.5f}, #paths: {}, time: {:.2f}s.'.format(
 				mcflow.flow, len(mcflow.stream['paths']), tend - ts
-			))
+			)
 
 			# reset state of the graph
 			np.copyto(G.csr.data, G_bak['data'])
@@ -162,7 +162,7 @@ def compute_relklinker(G, relsim, subs, preds, objs):
 
 		rp = relclosure(G, s, p, o, kind='metric', linkpred=True)
 		tend = time()
-		log.info('time: {:.2f}s'.format(tend - ts))
+		print 'time: {:.2f}s'.format(tend - ts)
 		times.append(tend - ts)
 		scores.append(rp.score)
 		paths.append(rp.path)
@@ -176,6 +176,10 @@ def compute_relklinker(G, relsim, subs, preds, objs):
 	log.info('')
 	return scores, paths, rpaths, times
 
+def normalize(df):
+	softmax = lambda x: np.exp(x) / float(np.exp(x).sum())
+	df['softmaxscore'] = df[['sid','score']].groupby(by=['sid'], as_index=False).transform(softmax)
+	return df
 
 def main(args=None):
 	# parse arguments
@@ -237,6 +241,7 @@ def main(args=None):
 			# save the results
 			spo_df['score'] = mincostflows
 			spo_df['time'] = times
+			spo_df = normalize(spo_df)
 			spo_df.to_csv(outcsv, sep=',', header=True, index=False)
 			log.info('* Saved results: %s' % outcsv)
 		log.info('Mincostflow computation complete. Time taken: {:.2f} secs.\n'.format(time() - t1))
@@ -248,6 +253,7 @@ def main(args=None):
 		spo_df['path'] = paths
 		spo_df['rpath'] = rpaths
 		spo_df['time'] = times
+		spo_df = normalize(spo_df)
 		outcsv = join(args.outdir, 'out_relklinker_{}_{}.csv'.format(base, DATE))
 		spo_df.to_csv(outcsv, sep=',', header=True, index=False)
 		log.info('* Saved results: %s' % outcsv)
