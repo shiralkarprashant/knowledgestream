@@ -1,0 +1,8 @@
+.DS_Store
+*.pyc
+*.so
+*.html
+build/
+data/
+knowledgestream.egg-info/
+output/
