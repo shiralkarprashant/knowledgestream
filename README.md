@@ -16,7 +16,7 @@ Download data from the following URL http://carl.cs.indiana.edu/data/fact-checki
 	- Oscars: [Academy Award for Best Picture](https://en.wikipedia.org/wiki/Academy_Award_for_Best_Picture)
 	- FLOTUS: [List of First Ladies of the United States](https://en.wikipedia.org/wiki/List_of_First_Ladies_of_the_United_States)
 	- World Capitals: [List of national capitals in alphabetical order](https://en.wikipedia.org/wiki/List_of_national_capitals_in_alphabetical_order)
-	- Birthplace-Deathplace: This was created just based on DBpedia. Persons having different birth and death place were identified and 250 individuals were sampled from five buckets partitioning ![Birthplace-Deathplace](http://carl.cs.indiana.edu/data/fact-checking/histogram_persons_vs_facts.pdf) distribution. Their death place was forged as a false example (or triple) of their birth place, while their birth place was taken as a true triple. 
+	- Birthplace-Deathplace: This was created just based on DBpedia. Persons having different birth and death place were identified and 250 individuals were sampled from five buckets partitioning [Birthplace-Deathplace](http://carl.cs.indiana.edu/data/fact-checking/histogram_persons_vs_facts.pdf) distribution. Their death place was forged as a false example (or triple) of their birth place, while their birth place was taken as a true triple. 
 
 # Install
 ```python setup.py install```
