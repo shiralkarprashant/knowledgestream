@@ -17,6 +17,7 @@ Download data from the following URL http://carl.cs.indiana.edu/data/fact-checki
 	- FLOTUS: [List of First Ladies of the United States](https://en.wikipedia.org/wiki/List_of_First_Ladies_of_the_United_States)
 	- World Capitals: [List of national capitals in alphabetical order](https://en.wikipedia.org/wiki/List_of_national_capitals_in_alphabetical_order)
 	- Birthplace-Deathplace: This was created just based on DBpedia. Persons having different birth and death place were identified and 250 individuals were sampled from five buckets partitioning [Birthplace-Deathplace](http://carl.cs.indiana.edu/data/fact-checking/histogram_persons_vs_facts.pdf) distribution. Their death place was forged as a false example (or triple) of their birth place, while their birth place was taken as a true triple, thereby creating 250 true and 250 false triples. 
+3. A relational similarity matrix obtained using TF-IDF representation of relations in the knowledge graph. See paper for details.
 
 # Install
 ```python setup.py install```
@@ -25,17 +26,17 @@ Download data from the following URL http://carl.cs.indiana.edu/data/fact-checki
 
 ## Knowledge Stream (KS)
 
-```kstream -m stream -d ./datasets/sample.csv -o output/```
+```kstream -m stream -d datasets/sample.csv -o output/```
 
 You should see output such as 
 
 ```
 [19:00:10] Launching stream..
 [19:00:10] Dataset: sample.csv
-[19:00:10] Output dir: /Users/pshiralk/Projects/knowledgestream/output
+[19:00:10] Output dir: output
 [19:00:10] Read data: (5, 7) sample.csv
 [19:00:10] Note: Found non-NA records: (5, 7)
-Reconstructing graph from /Users/pshiralk/Projects/knowledgestream/data/kg/_undir
+Reconstructing graph from data/kg/_undir
 => Loaded: undir_data.npy
 => Loaded: undir_indptr.npy
 => Loaded: undir_indices.npy
@@ -48,24 +49,24 @@ Reconstructing graph from /Users/pshiralk/Projects/knowledgestream/data/kg/_undi
  3. Working on (5140024, 599, 4567127) .. [19:01:01] mincostflow: 0.16628, #paths: 5, time: 9.20s.
  4. Working on (1522148, 599, 1357357) .. [19:01:11] mincostflow: 0.09414, #paths: 5, time: 9.28s.
  5. Working on (4319468, 599, 2450828) .. [19:01:19] mincostflow: 0.16025, #paths: 5, time: 8.05s.
-[19:01:19] * Saved results: /Users/pshiralk/Projects/knowledgestream/output/out_kstream_sample_2017-08-23.csv
+[19:01:19] * Saved results: output/out_kstream_sample_2017-08-23.csv
 [19:01:19] Mincostflow computation complete. Time taken: 57.64 secs.
 ```
 and a CSV file is created at the specified output directory, which contains `score` and `softmaxscore` (normalized) for each triple.
 
 ## Relational Knowledge Linker (KL-REL)
 
-```kstream -m relklinker -d ./datasets/sample.csv -o output/```
+```kstream -m relklinker -d datasets/sample.csv -o output/```
 
 You should see output such as 
 
 ```
 [18:56:43] Launching relklinker..
 [18:56:43] Dataset: sample.csv
-[18:56:43] Output dir: knowledgestream/output
+[18:56:43] Output dir: output
 [18:56:43] Read data: (5, 7) sample.csv
 [18:56:43] Note: Found non-NA records: (5, 7)
-Reconstructing graph from knowledgestream/data/kg/_undir
+Reconstructing graph from data/kg/_undir
 => Loaded: undir_data.npy
 => Loaded: undir_indptr.npy
 => Loaded: undir_indices.npy
@@ -79,7 +80,7 @@ Reconstructing graph from knowledgestream/data/kg/_undir
  3. Working on (5140024, 599, 4567127)..[18:57:00] time: 2.16s
  4. Working on (1522148, 599, 1357357)..[18:57:02] time: 2.15s
  5. Working on (4319468, 599, 2450828)..[18:57:03] 
-[18:57:03] * Saved results: knowledgestream/output/out_relklinker_sample_2017-08-23.csv
+[18:57:03] * Saved results: output/out_relklinker_sample_2017-08-23.csv
 [18:57:03] Relklinker computation complete. Time taken: 18.68 secs.
 ```
 and a CSV file is created at the specified output directory, which contains `score` and `softmaxscore` (normalized) for each triple.
