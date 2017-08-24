@@ -10,12 +10,12 @@ cd knowledgestream
 # Data
 Download data from the following URL http://carl.cs.indiana.edu/data/fact-checking/data.zip and decompress it inside `knowledgestream` directory. This compressed file contains three items: 
 
-1. DBpedia 2016-10 knowledge graph represented by three files: nodes.txt, relations.txt, and abbrev_cup_dbpedia_filtered.nt, which can also be downloaded from the DBpedia downloads page: (http://wiki.dbpedia.org/downloads-2016-10)[DBpedia 2016-10]. Additionally, it contains a directory named `_undir` which contains binary datastructures required by the code. 
-2. A collection of synthetic and real datasets, some of which were created by us, while others were downloaded from (https://github.com/nddsg/KGMiner/)[KGMiner] or as provided by Google and the WSDM Cup 2017 Triple Scoring challenge organizers. The true triples (positive examples) in the synthetic datasets created based on Wikipedia lists given below, and the false triples (negative examples) were created by "perturbing" the set of objects in each list; this is also called "local-closed world assumption (LCWA)."
-	- NBA-Team: https://en.wikipedia.org/wiki/List_of_NBA_players_who_have_spent_their_entire_career_with_one_franchise
-	- Oscars: https://en.wikipedia.org/wiki/Academy_Award_for_Best_Picture
-	- FLOTUS: https://en.wikipedia.org/wiki/List_of_First_Ladies_of_the_United_States
-	- World Capitals: https://en.wikipedia.org/wiki/List_of_national_capitals_in_alphabetical_order
+1. DBpedia 2016-10 knowledge graph represented by three files: nodes.txt, relations.txt, and abbrev_cup_dbpedia_filtered.nt, which can also be downloaded from the DBpedia downloads page: [DBpedia 2016-10](http://wiki.dbpedia.org/downloads-2016-10). Additionally, it contains a directory named `_undir` which contains binary datastructures required by the code. 
+2. A collection of synthetic and real datasets, some of which were created by us, while others were downloaded from [KGMiner](https://github.com/nddsg/KGMiner/) or as provided by Google and the WSDM Cup 2017 Triple Scoring challenge organizers. The true triples (positive examples) in the synthetic datasets created based on Wikipedia lists given below, and the false triples (negative examples) were created by "perturbing" the set of objects in each list; this is also called "local-closed world assumption (LCWA)."
+	- NBA-Team: [List of NBA players who have spent their entire career with one franchise](https://en.wikipedia.org/wiki/List_of_NBA_players_who_have_spent_their_entire_career_with_one_franchise)
+	- Oscars: [Academy Award for Best Picture](https://en.wikipedia.org/wiki/Academy_Award_for_Best_Picture)
+	- FLOTUS: [List of First Ladies of the United States](https://en.wikipedia.org/wiki/List_of_First_Ladies_of_the_United_States)
+	- World Capitals: [List of national capitals in alphabetical order](https://en.wikipedia.org/wiki/List_of_national_capitals_in_alphabetical_order)
 	- Birthplace-Deathplace: This was created just based on DBpedia. Persons having different birth and death place were identified and 250 individuals were sampled from five buckets partitioning ![Birthplace-Deathplace](http://carl.cs.indiana.edu/data/fact-checking/histogram_persons_vs_facts.pdf) distribution. Their death place was forged as a false example (or triple) of their birth place, while their birth place was taken as a true triple. 
 
 # Install
