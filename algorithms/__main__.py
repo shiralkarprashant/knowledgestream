@@ -17,10 +17,25 @@ from os.path import expanduser, abspath, isfile, isdir, basename, splitext, \
 	dirname, join, exists
 from time import time
 from datetime import date
+import cPickle as pkl
 
 from datastructures.rgraph import Graph, weighted_degree
+
+# OUR METHODS
 from algorithms.mincostflow.ssp import succ_shortest_path, disable_logging
 from algorithms.relklinker.rel_closure import relational_closure as relclosure
+from algorithms.klinker.closure import closure
+
+# STATE-OF-THE-ART ALGORITHMS
+from algorithms.predpath.predpath_mining import train_model as predpath_train_model
+from algorithms.pra.pra_mining import train_model as pra_train_model
+from algorithms.linkpred.katz import katz
+from algorithms.linkpred.pathentropy import pathentropy
+from algorithms.linkpred.simrank import c_simrank
+from algorithms.linkpred.jaccard_coeff import jaccard_coeff
+from algorithms.linkpred.adamic_adar import adamic_adar
+from algorithms.linkpred.pref_attach import preferential_attachment
+
 
 # KG - DBpedia
 HOME = abspath(expanduser('~/Projects/knowledgestream/data/'))
@@ -43,6 +58,34 @@ _short = np.int16
 _int = np.int32
 _int64 = np.int64
 _float = np.float
+
+# link prediction measures
+measure_map = {
+	'jaccard': {
+		'measure': jaccard_coeff,
+		'tag': 'JC'
+	},
+	'adamic_adar': {
+		'measure': adamic_adar,
+		'tag': 'AA'
+	},
+	'degree_product': {
+		'measure': preferential_attachment,
+		'tag': 'PA'
+	},
+	'katz': {
+		'measure': katz,
+		'tag': 'KZ'
+	},
+	'simrank': {
+		'measure': c_simrank,
+		'tag': 'SR'
+	},
+	'pathent': {
+		'measure': pathentropy,
+		'tag': 'PE'
+	}
+}
 
 # ================= KNOWLEDGE STREAM ALGORITHM ============
 
@@ -176,10 +219,111 @@ def compute_relklinker(G, relsim, subs, preds, objs):
 	log.info('')
 	return scores, paths, rpaths, times
 
+# ================= KNOWLEDGE LINKER ALGORITHM ============
+
+def compute_klinker(G, subs, preds, objs):
+	"""
+	Parameters:
+	-----------
+	G: rgraph
+		See `datastructures`.
+	subs, preds, objs: sequence
+		Sequences representing the subject, predicate and object of 
+		input triples.
+
+	Returns:
+	--------
+	scores, paths, rpaths, times: sequence
+		One sequence each for the proximity scores, shortest path in terms of 
+		nodes, shortest path in terms of relation sequence, and times taken.
+	"""
+	# set weights
+	indegsim = weighted_degree(G.indeg_vec, weight=WTFN).reshape((1, G.N))
+	indegsim = indegsim.ravel()
+	targets = G.csr.indices % G.N
+	specificity_wt = indegsim[targets] # specificity
+	G.csr.data = specificity_wt.copy()
+
+	# back up
+	data = G.csr.data.copy()
+	indices = G.csr.indices.copy()
+	indptr = G.csr.indptr.copy()
+
+	# compute closure
+	scores, paths, rpaths, times = [], [], [], []
+	for idx, (s, p, o) in enumerate(zip(subs, preds, objs)):
+		print '{}. Working on {}..'.format(idx+1, (s, p, o)),
+		ts = time()
+		rp = closure(G, s, p, o, kind='metric', linkpred=True)
+		tend = time()
+		print 'time: {:.2f}s'.format(tend - ts)
+		times.append(tend - ts)
+		scores.append(rp.score)
+		paths.append(rp.path)
+		rpaths.append(rp.relational_path)
+
+		# reset graph
+		G.csr.data = data.copy()
+		G.csr.indices = indices.copy()
+		G.csr.indptr = indptr.copy()
+		sys.stdout.flush()
+	log.info('')
+	return scores, paths, rpaths, times
+
 def normalize(df):
 	softmax = lambda x: np.exp(x) / float(np.exp(x).sum())
 	df['softmaxscore'] = df[['sid','score']].groupby(by=['sid'], as_index=False).transform(softmax)
 	return df
+
+
+# ================= LINK PREDICTION ALGORITHMS ============
+
+def link_prediction(G, subs, preds, objs, selected_measure='katz'):
+	"""
+	Performs link prediction using a specified measure, such as Katz or SimRank.
+
+	Parameters:
+	-----------
+	G: rgraph
+		See `datastructures`.
+	subs, preds, objs: sequence
+		Sequences representing the subject, predicate and object of 
+		input triples.
+
+	Returns:
+	--------
+	scores, times: sequence
+		One sequence each for the proximity scores and times taken.
+	"""
+	# back up
+	data = G.csr.data.copy()
+	indices = G.csr.indices.copy()
+	indptr = G.csr.indptr.copy()
+
+	# compute closure
+	measure_name = measure_map[selected_measure]['tag']
+	measure = measure_map[selected_measure]['measure']
+	log.info('Computing {} for {} triples..'.format(measure_name, len(subs)))
+	t1 = time()
+	scores, times = [], []
+	for idx, (s, p, o) in enumerate(zip(subs, preds, objs)):
+		print '{}. Working on {}..'.format(idx+1, (s, p, o)),
+		sys.stdout.flush()
+		ts = time()
+		score = measure(G, s, p, o, linkpred=True)
+		tend = time()
+		print 'score: {:.5f}, time: {:.2f}s'.format(score, tend - ts)
+		times.append(tend - ts)
+		scores.append(score)
+
+		# reset graph
+		G.csr.data = data.copy()
+		G.csr.indices = indices.copy()
+		G.csr.indptr = indptr.copy()
+		sys.stdout.flush()
+	print ''
+	return scores, times
+
 
 def main(args=None):
 	# parse arguments
@@ -188,7 +332,8 @@ def main(args=None):
 		formatter_class=argparse.ArgumentDefaultsHelpFormatter
 	)
 	parser.add_argument('-m', type=str, required=True,
-			dest='method', help='Method to use: stream or relklinker.')
+			dest='method', help='Method to use: stream, relklinker, klinker, \
+			predpath, pra, katz, pathent, simrank, adamic_adar, jaccard, degree_product.')
 	parser.add_argument('-d', type=str, required=True,
 			dest='dataset', help='Dataset to test on.')
 	parser.add_argument('-o', type=str, required=True,
@@ -198,7 +343,10 @@ def main(args=None):
 	# logging
 	disable_logging(log.DEBUG)
 
-	if args.method not in ('stream', 'relklinker'):
+	if args.method not in (
+		'stream', 'relklinker', 'klinker', 'predpath', 'pra',
+		'katz', 'pathent', 'simrank', 'adamic_adar', 'jaccard', 'degree_product'
+	):
 		raise Exception('Invalid method specified.')
 
 	# ensure input file and output directory is valid.
@@ -230,9 +378,9 @@ def main(args=None):
 	# execute
 	base = splitext(basename(args.dataset))[0]
 	t1 = time()
-	if args.method == 'stream':
+	if args.method == 'stream': # KNOWLEDGE STREAM (KS)
 		# compute min. cost flow
-		log.info('Computing KNOWLEDGE-STREAM for {} triples..'.format(spo_df.shape[0]))
+		log.info('Computing KS for {} triples..'.format(spo_df.shape[0]))
 		with warnings.catch_warnings():
 			warnings.simplefilter("ignore")
 			outjson = join(args.outdir, 'out_kstream_{}_{}.json'.format(base, DATE))
@@ -245,8 +393,8 @@ def main(args=None):
 			spo_df.to_csv(outcsv, sep=',', header=True, index=False)
 			log.info('* Saved results: %s' % outcsv)
 		log.info('Mincostflow computation complete. Time taken: {:.2f} secs.\n'.format(time() - t1))
-	elif args.method == 'relklinker':
-		log.info('Computing REL-KLINKER for {} triples..'.format(spo_df.shape[0]))
+	elif args.method == 'relklinker': # RELATIONAL KNOWLEDGE LINKER (KL-REL)
+		log.info('Computing KL-REL for {} triples..'.format(spo_df.shape[0]))
 		scores, paths, rpaths, times = compute_relklinker(G, relsim, subs, preds, objs)
 		# save the results
 		spo_df['score'] = scores
@@ -257,7 +405,54 @@ def main(args=None):
 		outcsv = join(args.outdir, 'out_relklinker_{}_{}.csv'.format(base, DATE))
 		spo_df.to_csv(outcsv, sep=',', header=True, index=False)
 		log.info('* Saved results: %s' % outcsv)
-		log.info('Relklinker computation complete. Time taken: {:.2f} secs.\n'.format(time() - t1))
+		log.info('Relatioanal KL computation complete. Time taken: {:.2f} secs.\n'.format(time() - t1))
+	elif args.method == 'klinker':
+		log.info('Computing KL for {} triples..'.format(spo_df.shape[0]))
+		scores, paths, rpaths, times = compute_klinker(G, subs, preds, objs)
+		# save the results
+		spo_df['score'] = scores
+		spo_df['path'] = paths
+		spo_df['rpath'] = rpaths
+		spo_df['time'] = times
+		spo_df = normalize(spo_df)
+		outcsv = join(args.outdir, 'out_klinker_{}_{}.csv'.format(base, DATE))
+		spo_df.to_csv(outcsv, sep=',', header=True, index=False)
+		log.info('* Saved results: %s' % outcsv)
+		log.info('KL computation complete. Time taken: {:.2f} secs.\n'.format(time() - t1))
+	elif args.method == 'predpath': # PREDPATH
+		vec, model = predpath_train_model(G, spo_df) # train
+		print 'Time taken: {:.2f}s\n'.format(time() - t1)
+		# save model
+		predictor = { 'dictvectorizer': vec, 'model': model }
+		try:
+			outpkl = join(args.outdir, 'out_predpath_{}_{}.pkl'.format(base, DATE))
+			with open(outpkl, 'wb') as g:
+				pkl.dump(predictor, g, protocol=pkl.HIGHEST_PROTOCOL)
+			print 'Saved: {}'.format(outpkl)
+		except IOError, e:
+			raise e
+	elif args.method == 'pra': # PRA
+		features, model = pra_train_model(G, spo_df)
+		print 'Time taken: {:.2f}s\n'.format(time() - t1)
+		# save model
+		predictor = { 'features': features, 'model': model }
+		try:
+			outpkl = join(args.outdir, 'out_pra_{}_{}.pkl'.format(base, DATE))
+			with open(outpkl, 'wb') as g:
+				pkl.dump(predictor, g, protocol=pkl.HIGHEST_PROTOCOL)
+			print 'Saved: {}'.format(outpkl)
+		except IOError, e:
+			raise e
+	elif args.method in ('katz', 'pathent', 'simrank', 'adamic_adar', 'jaccard', 'degree_product'):
+		scores, times = link_prediction(G, subs, preds, objs, selected_measure=args.method)
+		# save the results
+		spo_df['score'] = scores
+		spo_df['time'] = times
+		spo_df = normalize(spo_df)
+		outcsv = join(args.outdir, 'out_{}_{}_{}.csv'.format(args.method, base, DATE))
+		spo_df.to_csv(outcsv, sep=',', header=True, index=False)
+		print '* Saved results: %s' % outcsv
+	print '\nDone!\n'
 
 if __name__ == '__main__':
 	"""
@@ -271,6 +466,12 @@ if __name__ == '__main__':
 	kstream -m 'stream' -d ./datasets/sample.csv -o ./output/
 
 	# Relational Knowledge Linker (KL-REL)
+	kstream -m 'relklinker' -d ./datasets/sample.csv -o ./output/
 
+	# PredPath
+	kstream -m 'predpath' -d ./datasets/sample.csv -o ./output/	
+
+	# PRA
+	kstream -m 'pra' -d ./datasets/sample.csv -o ./output/	
 	"""
 	main()
