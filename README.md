@@ -229,7 +229,7 @@ Reconstructing graph from data/kg/_undir
 2. Working on (392035, 599, 4119746).. score: 0.02813, time: 3.99s
 3. Working on (392035, 599, 917821).. score: 0.03825, time: 3.59s
 ...
-\* Saved results: output/out_katz_sample_2017-08-25.csv
+* Saved results: output/out_katz_sample_2017-08-25.csv
 ```
 
 and a CSV file is created at the specified output directory, which contains `score` and `softmaxscore` (normalized) for each triple.
