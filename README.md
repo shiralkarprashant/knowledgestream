@@ -201,7 +201,7 @@ Saved: output/out_pra_sample_2017-08-25.pkl
 
 # TransE
 
-Code for this method and couple other methods based on the idea of knowledge graph embedding can be found at (KB2E)[https://github.com/thunlp/KB2E].
+Code for this method and couple other methods based on the idea of knowledge graph embedding can be found at [KB2E](https://github.com/thunlp/KB2E).
 
 # Link prediction algorithms: Katz, PathEnt, SimRank, Adamic & Adar, Jaccard, Degree Product
 
