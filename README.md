@@ -149,7 +149,7 @@ D: +:40, -:33, tot:73
 Time taken: 0.07s
 
 => Model building..
-\#Features: 73, best-AUROC: 0.92943
+#Features: 73, best-AUROC: 0.92943
 Time taken: 0.65s
 
 Time taken: 163.72s
@@ -180,7 +180,7 @@ Reconstructing graph from data/kg/_undir
 
 => Path extraction..
 ...
-\#Features: 73
+#Features: 73
 Time taken: 75.98s
 
 => Path selection..
@@ -191,7 +191,7 @@ Time taken at C level: 2.656s
 Time taken: 2.87590s
 
 => Model building..
-\#Features: 73, best-AUROC: 0.7786
+#Features: 73, best-AUROC: 0.7786
 Time taken: 0.59s
 
 Time taken: 81.39s
