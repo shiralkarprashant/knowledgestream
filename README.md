@@ -1,5 +1,5 @@
 # Paper
-Code to reproduce results in "Finding Streams in Knowledge Graphs to Support Fact Checking" in proceedings of ICDM 2017. A full version of the same can be found at: https://arxiv.org/abs/1708.07239
+Code to reproduce results in the paper "Finding Streams in Knowledge Graphs to Support Fact Checking" in proceedings of ICDM 2017. A full version of this paper can be found at: https://arxiv.org/abs/1708.07239
 
 # Fetch
 ```
