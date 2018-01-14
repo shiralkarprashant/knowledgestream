@@ -9,7 +9,7 @@ import numpy as np
 
 from numpy.random import choice
 
-from linkpred.algorithms.simrank_helper import simrank_helper
+from algorithms.linkpred.simrank_helper import simrank_helper
 
 # data types for int and float
 _short = np.int16

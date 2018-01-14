@@ -20,7 +20,12 @@ Download data from the following URL http://carl.cs.indiana.edu/data/fact-checki
 3. A relational similarity matrix obtained using TF-IDF representation of relations in the knowledge graph. See paper for details.
 
 # Install
+```python setup.py build_ext -if```
+
 ```python setup.py install```
+
+Note: for the second command, please do sudo in case you need installation rights on the machine.
+
 
 # Run 
 

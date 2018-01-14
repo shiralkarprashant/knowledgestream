@@ -8,7 +8,7 @@ cimport cython
 cimport numpy as np
 from libc.math cimport fmin, fmax
 from libc.stdlib cimport malloc, abort, free, calloc
-from klinker.closure.datastructures.heap cimport FastUpdateBinaryHeap
+from datastructures.heap cimport FastUpdateBinaryHeap
 
 # data types for int and float
 _short = np.int16

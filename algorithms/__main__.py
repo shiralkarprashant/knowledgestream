@@ -40,7 +40,19 @@ from algorithms.linkpred.pref_attach import preferential_attachment
 # KG - DBpedia
 HOME = abspath(expanduser('~/Projects/knowledgestream/data/'))
 if not exists(HOME):
-	raise Exception('Please set HOME to data directory in algorithms/__main__.py')
+	print 'Data directory not found: %s' % HOME
+	print 'Download data per instructions on:'
+	print '\thttps://github.com/shiralkarprashant/knowledgestream#data'
+	print 'and enter the directory path below.'
+	data_dir = raw_input('\nPlease enter data directory path: ')
+	if data_dir != '':
+		data_dir = abspath(expanduser(data_dir))
+	if not os.path.isdir(data_dir):
+		raise Exception('Entered path "%s" not a directory.' % data_dir)
+	if not exists(data_dir):
+		raise Exception('Directory does not exist: %s' % data_dir)
+	HOME = data_dir
+	# raise Exception('Please set HOME to data directory in algorithms/__main__.py')
 PATH = join(HOME, 'kg/_undir/')
 assert exists(PATH)
 SHAPE = (6060993, 6060993, 663)
