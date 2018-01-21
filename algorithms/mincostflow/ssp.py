@@ -105,7 +105,19 @@ def succ_shortest_path(G, cost_vec, s, p, t, linkpred=True, return_flow=True, np
 
 		# update residual graph and flow
 		# 	* Decrement forward edge's res. cap by bottleneck
-		#   * Increment backward edge's res. cap. by bottleneck (NOTE: Old (v, u) value is overwritten)
+		#   * Change backward edge's res. cap. by bottleneck 
+		#		[Note: In the case where we may have a directed edge (u, v) but not (v, u),
+		#		a flow from u to v would result in a backward edge from v to u with capacity
+		#		equal to the flow sent on (u, v). However, in the case where we may have both (u, v) 
+		#		and (v, u) from the same predicate, a flow along (u, v) creates an additional capacity 
+		#		along (v, u), which may result in a total capacity that exceeds 1. However, since the 
+		#		capacity captures a notion of similarity between predicates, we want it to be less than or
+		#		equal to 1. We therefore make an assumption in this work that there is only
+		#		an edge in one direction. Accordingly, once one of the forward or backward edges is used, we 
+		#		set the capacity of the other edge equal to the flow sent along the chosen edge, which is the bottleneck. 
+		#		This assumption does however mean that it may lead to different results. 
+		#		Current implementation thus makes this simplifying assumption (i.e., old (v, u) value 
+		#		is overwritten if it exists), and other ways can be devised in future work.]
 		#	* Update cost matrix (NOTE: old actual cost is overwritten)
 		# 	* Update flow
 		pathlen = len(path) - 1
@@ -114,7 +126,6 @@ def succ_shortest_path(G, cost_vec, s, p, t, linkpred=True, return_flow=True, np
 			residual_cap = G.csr[u, N * r + v] # G[u, v, r]
 			if residual_cap - bnck >= 0:
 				G.csr[u, N * r + v] -= bnck # update G[u, v, r]
-			residual_cap = G.csr[v, N * r + u] # G[v, u, r] 
 			G.csr[v, N * r + u] = bnck # G[v, u, r] 
 			cost_mtx[v, N * r + u] = -cost_mtx[u, N * r + v]
 			if return_flow:
