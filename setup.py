@@ -110,7 +110,8 @@ kwargs = dict(
     author_email='pshiralk@indiana.edu',
     packages=[
         'datastructures', 'algorithms', 'algorithms.mincostflow',
-        'algorithms.relcooc'
+        'algorithms.relklinker', 'algorithms.klinker', 'algorithms.relcooc',
+        'algorithms.predpath', 'algorithms.pra', 'algorithms.linkpred'
     ],
     include_package_data=True,
     install_requires=[
