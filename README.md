@@ -29,6 +29,8 @@ Note: for the second command, please do sudo in case you need installation right
 
 # Run 
 
+**Note**: For the ouput directory parameter ("-o") for any of the algorithms in this repository, please make sure the directory exists before launching the process. Otherwise, it throws an AssertionError due to a non-existent directory.
+
 ## Knowledge Stream (KS)
 
 ```kstream -m stream -d datasets/sample.csv -o output/```
