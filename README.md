@@ -23,7 +23,7 @@ Download data from the following URL http://carl.cs.indiana.edu/data/fact-checki
 # System requirements
 
 * **OS:** Linux Ubuntu / Mac OSX 10.12 (Sierra)
-* **Python:** Python 2.7 (we developed and testing using the Anaconda distribution)
+* **Python:** Python 2.7 (we developed and tested using the Anaconda distribution)
 * **Memory requirements:** >4 GB
 
 # Install
