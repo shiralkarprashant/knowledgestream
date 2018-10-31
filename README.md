@@ -5,6 +5,7 @@ Code to reproduce results in the paper "Finding Streams in Knowledge Graphs to S
 ```
 git clone https://github.com/shiralkarprashant/knowledgestream
 cd knowledgestream
+mkdir -p output
 ```
 
 # Data
@@ -19,7 +20,14 @@ Download data from the following URL http://carl.cs.indiana.edu/data/fact-checki
 	- Birthplace-Deathplace: This was created just based on DBpedia. Persons having different birth and death place were identified and 250 individuals were sampled from five buckets partitioning [Birthplace-Deathplace](http://carl.cs.indiana.edu/data/fact-checking/histogram_persons_vs_facts.pdf) distribution. Their death place was forged as a false example (or triple) of their birth place, while their birth place was taken as a true triple, thereby creating 250 true and 250 false triples. 
 3. A relational similarity matrix obtained using TF-IDF representation of relations in the knowledge graph. See paper for details.
 
+# System requirements
+
+* **OS:** Linux Ubuntu / Mac OSX 10.12 (Sierra)
+* **Python:** Python 2.7 (we developed and testing using the Anaconda distribution)
+* **Memory requirements:** >4 GB
+
 # Install
+
 ```python setup.py build_ext -if```
 
 ```python setup.py install```
