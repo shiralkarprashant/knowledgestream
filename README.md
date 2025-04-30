@@ -9,16 +9,26 @@ mkdir -p output
 ```
 
 # Data
-Download data from the following URL http://carl.cs.indiana.edu/data/fact-checking/data.zip and decompress it inside `knowledgestream` directory. This compressed file contains three items: 
 
-1. DBpedia 2016-10 knowledge graph represented by three files: nodes.txt, relations.txt, and abbrev_cup_dbpedia_filtered.nt, which have been derived from raw data on the DBpedia downloads page: [DBpedia 2016-10](http://wiki.dbpedia.org/downloads-2016-10). Additionally, it contains a directory named `_undir` which contains datastructures in binary format as required by the code. If you are interested in applying methods in this repository on your own knowledge graph, you may use the following script to generate the required graph files (.npy): [KG generation script](https://github.com/shiralkarprashant/knowledgestream/blob/master/datastructures/test_graph.py)
-2. A collection of synthetic and real datasets, some of which were created by us, while others were downloaded from [KGMiner](https://github.com/nddsg/KGMiner/) or as provided by Google and the WSDM Cup 2017 Triple Scoring challenge organizers. The true triples (positive examples) in the synthetic datasets created based on Wikipedia lists given below, and the false triples (negative examples) were created by "perturbing" the set of objects in each list; this is also called "local-closed world assumption (LCWA)."
-	- NBA-Team: [List of NBA players who have spent their entire career with one franchise](https://en.wikipedia.org/wiki/List_of_NBA_players_who_have_spent_their_entire_career_with_one_franchise)
-	- Oscars: [Academy Award for Best Picture](https://en.wikipedia.org/wiki/Academy_Award_for_Best_Picture)
-	- FLOTUS: [List of First Ladies of the United States](https://en.wikipedia.org/wiki/List_of_First_Ladies_of_the_United_States)
-	- World Capitals: [List of national capitals in alphabetical order](https://en.wikipedia.org/wiki/List_of_national_capitals_in_alphabetical_order)
-	- Birthplace-Deathplace: This was created just based on DBpedia. Persons having different birth and death place were identified and 250 individuals were sampled from five buckets partitioning [Birthplace-Deathplace](http://carl.cs.indiana.edu/data/fact-checking/histogram_persons_vs_facts.pdf) distribution. Their death place was forged as a false example (or triple) of their birth place, while their birth place was taken as a true triple, thereby creating 250 true and 250 false triples. 
-3. A relational similarity matrix obtained using TF-IDF representation of relations in the knowledge graph. See paper for details.
+Update: April 2025 - The specific version of DBpedia knowledge graph (DBpedia 2016-10), test datasets and relational similarity matrix used in the paper, which were previously accessible at [this location](http://carl.cs.indiana.edu/data/fact-checking/data.zip), aren't unfortunately available anymore. However, the following instructions might be helpful if you are interested in running the code.
+
+## Knowledge Graph
+
+You may use [this example script](https://github.com/shiralkarprashant/knowledgestream/blob/master/create_knowledge_graph_04292025.py) to re-create a knowledge graph from one of the latest versions of the [raw DBpedia datasets](https://databus.dbpedia.org/dbpedia/collections/latest-core). An old video demonstrating how to use the code is available [here](https://www.dropbox.com/s/xlhyna1oiqtn86j/knowledge-stream-linux-demo-09032019.mov?dl=0). Once assembled, place the data inside the `knowledgestream` directory. Processing the raw dataset should lead to creation of three files collectively representing the knowledge graph: nodes.txt, relations.txt, abbrev_cup_dbpedia_filtered.nt. You may also try using the following script to generate the required graph files (.npy): [KG generation script](https://github.com/shiralkarprashant/knowledgestream/blob/master/datastructures/test_graph.py)
+
+## Test Datasets
+
+The following Wikipedia lists contain the true triples (relationships) between entities used in the test datasets in the paper. The false triples (negative examples) were created by "perturbing" the set of objects in each list by making a "local-closed world assumption (LCWA)."
+
+- NBA-Team: [List of NBA players who have spent their entire career with one franchise](https://en.wikipedia.org/wiki/List_of_NBA_players_who_have_spent_their_entire_career_with_one_franchise)
+- Oscars: [Academy Award for Best Picture](https://en.wikipedia.org/wiki/Academy_Award_for_Best_Picture)
+- FLOTUS: [List of First Ladies of the United States](https://en.wikipedia.org/wiki/List_of_First_Ladies_of_the_United_States)
+- World Capitals: [List of national capitals in alphabetical order](https://en.wikipedia.org/wiki/List_of_national_capitals_in_alphabetical_order)
+- Birthplace-Deathplace: This was created just based on DBpedia. Persons having different birth and death place were identified and 250 individuals were sampled from five buckets partitioning [Birthplace-Deathplace](http://carl.cs.indiana.edu/data/fact-checking/histogram_persons_vs_facts.pdf) distribution. Their death place was forged as a false example (or triple) of their birth place, while their birth place was taken as a true triple, thereby creating 250 true and 250 false triples. 
+
+## Relational Similarity Matrix
+
+The relational similarity matrix derived using TF-IDF representations of relations of a graph can be created by following Section II.A of the paper. 
 
 # System requirements
 
